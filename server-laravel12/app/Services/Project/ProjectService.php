@@ -1,0 +1,18 @@
+<?php
+
+namespace App\Services\Project;
+
+use App\Http\Resources\ProjectResource;
+
+interface ProjectService 
+{
+    public function initiation();
+    public function projectQuantity();
+    public function projects();
+    public function find(int $id):ProjectResource;
+    public function personnel(int $projectId);
+    public function updateStatus(int $projectId,array $data);
+    public function lock(int $id);
+    public function delete(array $projects);
+    public function create(array $data);
+}
