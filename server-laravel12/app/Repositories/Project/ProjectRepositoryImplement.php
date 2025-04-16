@@ -29,9 +29,9 @@ class ProjectRepositoryImplement extends BaseRepositoryImplement implements Proj
         })->when($end_date, function ($q) use ($end_date) {
             $q->where('ended_at', '<=', $end_date);
         })->when($name, function ($q) use ($name) {
-            $q->where('name', '%LIKE%', $name);
+            $q->where('name', 'LIKE', "%$name%");
         })->when($uuid, function ($q) use ($uuid) {
-            $q->where('uuid', '%LIKE%', $uuid);
+            $q->where('uuid', 'LIKE', "%$uuid%");
         })->when($status, function ($q) use ($status) {
             $q->where('status', '=', $status);
         });
@@ -42,9 +42,12 @@ class ProjectRepositoryImplement extends BaseRepositoryImplement implements Proj
         return [
             'sum' => $this->model->count(),
             'waitings' => $this->query()->where('status', 'WAITING')->count(),
-            'refuse' =>  $this->query()->where('status', 'REFUSE')->count()
+            'refuse' =>  $this->query()->where('status', 'REFUSE')->count(),
+            'developing' => $this->query()->where('status', 'DEVELOPING')->count(),
+            'pausing' => $this->query()->where('status', 'PAUSING')->count(),
+            'done' => $this->query()->where('status', 'DONE')->count(),
+            'failed' => $this->query()->where('status', 'FAILED')->count(),
+            'close' => $this->query()->where('status', 'CLOSE')->count(),
         ];
     }
-
-    
 }

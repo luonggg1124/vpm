@@ -181,6 +181,7 @@ const PersonnelTable = () => {
               </SelectGroup>
             </SelectContent>
           </Select>{" "}
+          <p className="text-sm border p-2 rounded-lg">Tổng số bản ghi : {pagination?.total_item}</p>
         </div>
         <div>
           {pagination && (

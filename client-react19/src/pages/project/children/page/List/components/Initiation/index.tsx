@@ -21,9 +21,7 @@ import useQueryConfig from "@/api/hook/useQueryConfig";
 import { PATH_PROJECT } from "@/constants/path/project";
 import { IProject } from "@/api/interfaces/IProject";
 import { useNavigate, useSearchParams } from "react-router-dom";
-
 import { Button } from "@/components/ui/button";
-
 import { PaginationMeta } from "@/api/hook/usePaginate";
 
 const Initiation: React.FC = () => {
@@ -115,6 +113,7 @@ const Initiation: React.FC = () => {
               </SelectGroup>
             </SelectContent>
           </Select>{" "}
+          <p className="text-sm border p-2 rounded-lg">Tổng số bản ghi : {pagination?.total_item}</p>
         </div>
         <div>
           {pagination && (

@@ -4,7 +4,11 @@ import { apiManager } from "..";
 
 import { PATH_PROJECT } from "@/constants/path/project";
 import { toast } from "sonner";
-import { IProject, ProjectLogMeta, ProjectStatus } from "../interfaces/IProject";
+import {
+  IProject,
+  ProjectLogMeta,
+  ProjectStatus,
+} from "../interfaces/IProject";
 import { useQueryClient } from "@tanstack/react-query";
 import { IUser } from "../interfaces/IUser";
 
@@ -14,7 +18,8 @@ type Loadings = {
   lockProject: boolean;
   getOneProject: boolean;
   updateStatus: boolean;
-  createProject:boolean;
+  createProject: boolean;
+  updateProject: boolean;
 };
 
 const useProject = () => {
@@ -25,7 +30,8 @@ const useProject = () => {
     lockProject: false,
     getOneProject: false,
     updateStatus: false,
-    createProject:false,
+    createProject: false,
+    updateProject: false,
   });
   const [projects, setProject] = useState([]);
   const navigate = useNavigate();
@@ -91,6 +97,7 @@ const useProject = () => {
       });
     }
   };
+
   const deleteProjects = async (projects: Array<IProject>) => {
     try {
       setLoading({
@@ -117,29 +124,72 @@ const useProject = () => {
       });
     }
   };
-  const createProject = async (
+  const createProject = async (data: {
+    uuid: string;
+    name: string;
+    started_at: string;
+    ended_at: string;
+    status: ProjectStatus;
+    pm?: IUser;
+    pa?: IUser;
+    description: string;
+    priority: string;
+    personnel: string[];
+  }) => {
+    try {
+      setLoading({
+        ...loading,
+        createProject: true,
+      });
+      await apiManager("post", PATH_PROJECT.CREATE.ROUTE, data);
+      queryClient.invalidateQueries({ queryKey: [PATH_PROJECT.QUERY_KEY] });
+      navigate("/projects");
+    } catch (error: any) {
+      if (error?.status === 400) {
+        return error?.response?.data;
+      }
+      toast("Lỗi", {
+        description: error?.data?.error,
+        action: {
+          label: "Ẩn",
+          onClick: () => console.log(error?.data?.error),
+        },
+      });
+      console.log(error);
+    } finally {
+      setLoading({
+        ...loading,
+        createProject: false,
+      });
+    }
+  };
+  const updateProject = async (
+    id: any,
     data: {
-     uuid: string;
-       name: string;
-       started_at: string;
-       ended_at: string;
-       status: ProjectStatus;
-       pm?: IUser;
-       pa?: IUser;
-       is_lock:boolean;
-       description:string;
-       priority:string;
-       personnel: IUser[];
+      uuid: string;
+      name: string;
+      started_at: string;
+      ended_at: string;
+      status: ProjectStatus;
+      pm?: IUser;
+      pa?: IUser;
+      description: string;
+      priority: string;
+      personnel: string[];
     }
   ) => {
     try {
       setLoading({
         ...loading,
-        deleteProject: true,
+        updateProject: true,
       });
-      await apiManager("post", PATH_PROJECT.CREATE.ROUTE, data);
+      await apiManager("put", PATH_PROJECT.UPDATE.ROUTE(id), data);
       queryClient.invalidateQueries({ queryKey: [PATH_PROJECT.QUERY_KEY] });
+      navigate("/projects");
     } catch (error: any) {
+      if (error?.status === 400) {
+        return error?.response?.data;
+      }
       toast("Lỗi", {
         description: error?.data?.error,
         action: {
@@ -150,10 +200,11 @@ const useProject = () => {
     } finally {
       setLoading({
         ...loading,
-        deleteProject: false,
+        updateProject: false,
       });
     }
   };
+
   const updateStatus = async (
     id: string | number,
     data: {
@@ -191,7 +242,8 @@ const useProject = () => {
     deleteProjects,
     lockProject,
     updateStatus,
-    createProject
+    createProject,
+    updateProject,
   };
 };
 export default useProject;

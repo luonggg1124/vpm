@@ -14,19 +14,34 @@ import { Checkbox } from "@/components/ui/checkbox";
 import Lock from "./components/lock";
 import { Skeleton } from "@/components/ui/skeleton";
 import { sortByDateAsc } from "@/utils/datetime";
-import { Eye } from "lucide-react";
+import { Eye, Pen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import SendForReview from "./components/send-for-review";
 
 type Props = {
   project: IProject[];
   loading?: boolean;
   sortByDate?: string;
+  action?: {
+    lock?: boolean;
+    changeStatus?: boolean;
+    delete?: boolean;
+    watch?: boolean;
+    sendForReview?: boolean;
+  };
 };
 const ProjectTable = ({
   project,
   loading = false,
   sortByDate = "started_at",
+  action = {
+    lock: true,
+    changeStatus: true,
+    delete: true,
+    watch: true,
+    sendForReview: false,
+  },
 }: Props) => {
   if (Boolean(sortByDate)) {
     project = sortByDateAsc(project, sortByDate);
@@ -151,10 +166,6 @@ const ProjectTable = ({
                   </TableRow>
                 ))
               : project.map((row, index) => {
-                  const { value: status, color } = projectStatusString(
-                    row.status
-                  );
-
                   return (
                     <TableRow key={index}>
                       <TableCell>
@@ -171,7 +182,12 @@ const ProjectTable = ({
                         {row.id}
                       </TableCell>
                       <TableCell className="text-[12px] border-l-1 text-center  whitespace-normal  w-[167px] max-w-[167px] break-words">
-                        {row.name}
+                        <Link
+                          to={`/projects/update/${row.id}`}
+                          className="hover:underline cursor-pointer"
+                        >
+                          {row.name}
+                        </Link>
                       </TableCell>
                       <TableCell className="text-[12px] border-l-1 text-center whitespace-normal  w-[167px] max-w-[167px] break-words">
                         {row.uuid}
@@ -192,28 +208,41 @@ const ProjectTable = ({
                           <p>Quá hạn : {row.tasks_overdue_count}</p>
                         </div>
                       </TableCell>
-                      <TableCell className="text-[12px] border-l-1 ">
-                        <p
-                          className={
-                            color +
-                            " font-semibold text-center border p-2 rounded-lg"
-                          }
-                        >
-                          {status}
-                        </p>
+                      <TableCell className="text-[12px] border-l-1 w-[167px] max-w-[167px] ">
+                        <ChangeStatus project={row} />
                       </TableCell>
                       <TableCell className="border-l-1 flex items-center gap-2">
-                        <ChangeStatus project={row} />
-                        <Lock project={row} />
-                        <Delete project={[row]} />
-                        <Link to={`/projects/${row.id}`}>
-                          <Button
-                            variant="outline"
-                            className="cursor-pointer size-9 text-center hover:bg-gray-200  text-gray-700"
-                          >
-                            <Eye />
-                          </Button>
-                        </Link>
+                        {action.changeStatus ? (
+                          <Link to={`/projects/update/${row.id}`}>
+                            <Button
+                              variant="outline"
+                              className="cursor-pointer text-center hover:bg-gray-200 text-gray-700"
+                            >
+                              <Pen />
+                            </Button>
+                          </Link>
+                        ) : (
+                          ""
+                        )}
+                        {action.lock ? <Lock project={row} /> : ""}
+                        {action.delete ? <Delete project={[row]} /> : ""}
+                        {action.watch ? (
+                          <Link to={`/projects/${row.id}`}>
+                            <Button
+                              variant="outline"
+                              className="cursor-pointer size-9 text-center hover:bg-gray-200  text-gray-700"
+                            >
+                              <Eye />
+                            </Button>
+                          </Link>
+                        ) : (
+                          ""
+                        )}
+                        {action.sendForReview ? (
+                          <SendForReview project={row} />
+                        ) : (
+                          ""
+                        )}
                       </TableCell>
                     </TableRow>
                   );

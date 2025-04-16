@@ -29,11 +29,14 @@ import { PaginationMeta } from "@/api/hook/usePaginate";
 const Initiation: React.FC = () => {
   const navigate = useNavigate();
   const [params] = useSearchParams();
-   const [perPage,setPerPage]= useState<string>("10");
+  const [perPage, setPerPage] = useState<string>("10");
   const { data: projectsData, isFetching } = useQueryConfig(
     [
-      PATH_PROJECT.QUERY_KEY,PATH_PROJECT.PROJECTS.QUERY_KEY +
-        `?paginate=true_project_table&include=pm&per_page=${perPage}&page=${params.get("page") || 1}&${PATH_PROJECT.PROJECTS.Filter(
+      PATH_PROJECT.QUERY_KEY,
+      PATH_PROJECT.PROJECTS.QUERY_KEY +
+        `?paginate=true_project_table&include=pm&per_page=${perPage}&page=${
+          params.get("page") || 1
+        }&${PATH_PROJECT.PROJECTS.Filter(
           params.get(FILTER_PROJECT_KEY.name) || "",
           params.get(FILTER_PROJECT_KEY.uuid) || "",
           params.get(FILTER_PROJECT_KEY.status) || "",
@@ -42,7 +45,9 @@ const Initiation: React.FC = () => {
         )}`,
     ],
     PATH_PROJECT.PROJECTS.ROUTE +
-      `?paginate=true&include=pm&per_page=${perPage}&page=${params.get("page") || 1}&${PATH_PROJECT.PROJECTS.Filter(
+      `?paginate=true&include=pm&per_page=${perPage}&page=${
+        params.get("page") || 1
+      }&${PATH_PROJECT.PROJECTS.Filter(
         params.get(FILTER_PROJECT_KEY.name) || "",
         params.get(FILTER_PROJECT_KEY.uuid) || "",
         params.get(FILTER_PROJECT_KEY.status) || "",
@@ -101,20 +106,25 @@ const Initiation: React.FC = () => {
           </Select>{" "}
           <Select value={perPage} onValueChange={setPerPage}>
             <SelectTrigger arrowDisplay={false} className="w-[146px]">
-               <p>{perPage} / Trang</p><ChevronUp />
+              <p>{perPage} / Trang</p>
+              <ChevronUp />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>Các bản ghi mỗi trang</SelectLabel>
-                {Array.from({length:20}).map((_,index) => 
-                {
-
-                 return <SelectItem key={index} value={String(Number(index) + 5)}>{(Number(index) + 5)} bản ghi</SelectItem>
+                {Array.from({ length: 20 }).map((_, index) => {
+                  return (
+                    <SelectItem key={index} value={String(Number(index) + 5)}>
+                      {Number(index) + 5} bản ghi
+                    </SelectItem>
+                  );
                 })}
-                
               </SelectGroup>
             </SelectContent>
           </Select>{" "}
+          <p className="text-sm border p-2 rounded-lg">
+            Tổng số bản ghi : {pagination?.total_item}
+          </p>
         </div>
         <div>
           {pagination && (

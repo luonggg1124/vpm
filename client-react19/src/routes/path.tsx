@@ -8,6 +8,12 @@ import Project from "../pages/project";
 import ProjectsApprove from "../pages/project/children/page/Approve";
 import ListProjects from "../pages/project/children/page/List";
 import Detail from "@/pages/project/children/page/Detail";
+import UpdateProject from "@/pages/project/children/page/Update";
+import Personnel from "@/pages/personnel";
+import ListPersonnel from "@/pages/personnel/children/List";
+import Task from "@/pages/task";
+import ListTask from "@/pages/task/children/page/List";
+
 
 const path = [
   {
@@ -46,8 +52,32 @@ const path = [
             path: ":id",
             element: <Detail   />,
           },
+          {
+            path: "update/:id",
+            element: <UpdateProject   />,
+          },
         ],
       },
+      {
+        path: "/personnel",
+        element: <Personnel/>,
+        children: [
+          {
+            path: "",
+            element: <ListPersonnel/>
+          }
+        ]
+      },
+      {
+        path: "/tasks",
+        element: <Task/>,
+        children: [
+          {
+            path: "",
+            element: <ListTask/>
+          }
+        ]
+      }
     ],
   },
 ];

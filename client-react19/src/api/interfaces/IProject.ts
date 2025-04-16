@@ -55,7 +55,7 @@ export function projectStatusString(status: ProjectStatus) {
     case ProjectStatus.Done:
       return {
         value: "Hoàn thành",
-        color: "text-green-900 border-green-900 ",
+        color: "text-white bg-green-600  ",
       };
     case ProjectStatus.Refuse:
       return {
@@ -70,7 +70,7 @@ export function projectStatusString(status: ProjectStatus) {
     case ProjectStatus.Failed:
       return {
         value: "Thất bại",
-        color: "text-red-600 border-red-600 ",
+        color: "text-gray-600 border-gray-600 bg-white ",
       };
     case ProjectStatus.Pausing:
       return {
@@ -80,7 +80,7 @@ export function projectStatusString(status: ProjectStatus) {
     case ProjectStatus.Waiting:
       return {
         value: "Đang chờ duyệt",
-        color: "text-gray-600 border-gray-600 ",
+        color: "text-red-800 border-red-800 ",
       };
     case ProjectStatus.Close:
       return {

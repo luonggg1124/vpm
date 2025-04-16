@@ -31,7 +31,8 @@ class ProjectResource extends JsonResource
             'tasks_pending_count' => $this->tasks_pending_count,
             'tasks_overdue_count' => $this->tasks_overdue_count,
             'priority' => $this->priority,
-            'logs' => ProjectLogResource::collection($this->whenLoaded('logs'))
+            'logs' => ProjectLogResource::collection($this->whenLoaded('logs')),
+            'description' => $this->description,
         ];
     }
 }

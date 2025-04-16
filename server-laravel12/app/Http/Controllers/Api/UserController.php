@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Services\User\UserService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
@@ -15,13 +16,22 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-      
+
         try {
             return response()->json([
-                ...$this->userService->all($request->query('target',1))
+                ...$this->userService->all(array_map('intval', explode(',', $request->query('target', 1))))
             ]);
         } catch (\Throwable $th) {
-            //throw $th;
+            Log::error(
+                message: __CLASS__ . '@' . __FUNCTION__,
+                context: [
+                    'line' => $th->getLine(),
+                    'message' => $th->getMessage()
+                ]
+            );
+            return response()->json([
+                'error' => 'Lỗi nội bộ máy chủ'
+            ], 500);
         }
     }
 

@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -23,7 +24,9 @@ class TaskFactory extends Factory
             'project_id' => random_int(1,20),
             'status' => $this->faker->randomElement(['DONE','PENDING','PAUSING','OVERDUE']),
             'feature' => $this->faker->name(),
-            'designated_personnel_id' => random_int(1,20)
+            'designated_personnel_id' => random_int(1,20),
+            'status_changed_at' => Carbon::instance($this->faker->dateTimeBetween('-1 months', 'now')),
+            'ended_at' =>  Carbon::instance($this->faker->dateTimeBetween('-1 months', 'now')),
         ];
     }
 }

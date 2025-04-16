@@ -55,9 +55,9 @@ const ChangeStatus = ({ project }: Props) => {
   const { data: usersData, isFetching } = useQueryConfig(
     [
       PATH_USER.ALL.QUERY_KEY +
-        `?${PATH_USER.ALL.Filter(project?.pa?.id || 1)}`,
+        `?${PATH_USER.ALL.Filter([project?.pa?.id || 1])}`,
     ],
-    PATH_USER.ALL.ROUTE + `?${PATH_USER.ALL.Filter(project?.pa?.id || 1)}`
+    PATH_USER.ALL.ROUTE + `?${PATH_USER.ALL.Filter([project?.pa?.id || 1])}`
   );
 
   const users: IUser[] = (usersData as any)?.data?.data || [project.pa];
@@ -68,15 +68,16 @@ const ChangeStatus = ({ project }: Props) => {
     await updateStatus(project.id, projectData);
     setOpen(false);
   };
+  const { value: status, color } = projectStatusString(project.status);
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger className="size-9" asChild>
-        <Button
-          variant="outline"
-          className="cursor-pointer text-center hover:bg-gray-200 text-gray-700"
+        <p
+          className={color + " font-semibold text-center border p-2 rounded-lg w-full cursor-pointer"}
         >
-          <Pen />
-        </Button>
+          {status}
+        </p>
+        
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
@@ -87,7 +88,12 @@ const ChangeStatus = ({ project }: Props) => {
         </AlertDialogHeader>
         <div className="flex flex-col gap-2">
           <h3 className="text-gray-500 font-semibold">Quản trị dự án</h3>
-          <Select onValueChange={(v) => setProjectData({...projectData,pa_id:Number(v)}) } defaultValue={String(projectData?.pa_id)}>
+          <Select
+            onValueChange={(v) =>
+              setProjectData({ ...projectData, pa_id: Number(v) })
+            }
+            defaultValue={String(projectData?.pa_id)}
+          >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Chọn trạng thái" />
             </SelectTrigger>

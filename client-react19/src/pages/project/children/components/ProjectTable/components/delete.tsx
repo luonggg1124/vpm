@@ -35,7 +35,7 @@ const Delete = ({ project,label = "" }: Props) => {
       <AlertDialogTrigger className="size-9"  asChild>
         <Button
           variant="outline"
-          className={`cursor-pointer text-center hover:bg-gray-200${label ? " text-red-500" : " text-gray-700"} `}
+          className={`cursor-pointer text-center hover:bg-gray-200${label ? " text-red-500 w-16" : " text-gray-700"} `}
         >
           <Trash2 /> {label}
         </Button>

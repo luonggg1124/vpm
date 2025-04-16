@@ -1,4 +1,4 @@
-import { Building2, ChartColumn, FileCheck2, House, Users } from "lucide-react";
+import { Building2, ChartColumn, ChartColumnIncreasing, FileCheck2, House, Users } from "lucide-react";
 import React, { JSX } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
@@ -39,6 +39,12 @@ const listItem: ItemSidebarProps[] = [
         href: "/projects/approve",
       },
     ],
+  },
+  {
+    icon: <ChartColumnIncreasing  size={20} />,
+    label: "Nhiệm vụ",
+    href: "/tasks",
+    type: "link",
   },
   {
     icon: <Building2 size={20} />,

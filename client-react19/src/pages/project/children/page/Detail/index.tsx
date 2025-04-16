@@ -12,14 +12,21 @@ import Project from "./components/Project";
 import NotFound from "@/pages/notfound";
 import { IProject } from "@/api/interfaces/IProject";
 import { Skeleton } from "@/components/ui/skeleton";
+import Tasks from "./components/Tasks";
+import Logs from "./components/Logs";
+import Docs from "./components/Docs";
 const triggers = [
   {
     label: "Dự án",
     value: "project",
   },
   {
-    label: "Task",
+    label: "Nhiệm vụ",
     value: "tasks",
+  },
+  {
+    label: "Tài liệu",
+    value: "docs",
   },
   {
     label: "Hoạt động",
@@ -85,8 +92,14 @@ const Detail = () => {
         <TabsContent value="project">
           <Project loading={isLoading} project={project} />
         </TabsContent>
-        <TabsContent value="initiation">
-          <div></div>
+        <TabsContent value="tasks">
+          <Tasks/>
+        </TabsContent>
+        <TabsContent value="docs">
+          <Docs/>
+        </TabsContent>
+        <TabsContent value="logs">
+          <Logs/>
         </TabsContent>
       </Tabs>
     </div>

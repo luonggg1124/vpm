@@ -5,6 +5,6 @@ namespace App\Services\User;
 
 interface UserService 
 {
-    public function all(int|string $targetId);
+    public function all(array $targetId);
 
 }

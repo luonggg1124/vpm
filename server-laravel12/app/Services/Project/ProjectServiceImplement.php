@@ -7,6 +7,7 @@ use App\Enum\ProjectStatus;
 use App\Enum\TaskStatus;
 use App\Http\Resources\PersonnelResource;
 use App\Http\Resources\ProjectResource;
+use App\Http\Resources\TaskResource;
 use App\Traits\Pagination;
 use App\Traits\CanLoadRelationships;
 
@@ -85,8 +86,7 @@ class ProjectServiceImplement implements ProjectService
                 status: $status
             )->whereIn('status', [
                 ProjectStatus::FAILED->value,
-                ProjectStatus::REFUSE->value,
-                ProjectStatus::WAITING->value,
+                ProjectStatus::CLOSE->value,
                 ProjectStatus::DONE->value,
             ]))->orderByDesc('updated_at')->paginate(is_numeric($perPage) ? $perPage : 10);
             return [
@@ -102,10 +102,50 @@ class ProjectServiceImplement implements ProjectService
                 status: $status
             )->whereIn('status', [
                 ProjectStatus::FAILED->value,
-                ProjectStatus::REFUSE->value,
-                ProjectStatus::WAITING->value,
+                ProjectStatus::CLOSE->value,
                 ProjectStatus::DONE->value,
             ]))->orderByDesc('updated_at')->get();
+            return [
+                'data' => ProjectResource::collection($projects)
+            ];
+        }
+    }
+    public function approve()
+    {
+        $perPage = request()->query('per_page');
+        $name = request()->query('name');
+        $uuid = request()->query('uuid');
+        $status = request()->query('status');
+        $start_date = request()->query('start_date');
+        $end_date = request()->query('end_date');
+        $paginate = request()->query('paginate');
+
+        if ($paginate) {
+            $projects = $this->loadRelationships($this->projectRepository->filter(
+                start_date: $start_date,
+                end_date: $end_date,
+                name: $name,
+                uuid: $uuid,
+                status: $status
+            )->whereIn('status', [
+                ProjectStatus::REFUSE->value,
+                ProjectStatus::WAITING->value,
+            ]))->orderBy('updated_at','asc')->paginate(is_numeric($perPage) ? $perPage : 10);
+            return [
+                'pagination' => $this->paginate($projects),
+                'data' =>  ProjectResource::collection($projects->items())
+            ];
+        } else {
+            $projects = $this->loadRelationships($this->projectRepository->filter(
+                start_date: $start_date,
+                end_date: $end_date,
+                name: $name,
+                uuid: $uuid,
+                status: $status
+            )->whereIn('status', [
+                ProjectStatus::REFUSE->value,
+                ProjectStatus::WAITING->value,
+            ]))->orderBy('updated_at','asc')->get();
             return [
                 'data' => ProjectResource::collection($projects)
             ];
@@ -116,15 +156,24 @@ class ProjectServiceImplement implements ProjectService
         return $this->projectRepository->projectQuantity();
     }
 
-    public function create(array $data) {
+    public function create(array $data)
+    {
         $project = $this->projectRepository->create($data);
-        if(!$project){
+        if (!$project) {
             throw new Exception("Không thể tạo dự án");
         }
         $project->personnel()->attach($data['personnel']);
         return new ProjectResource($project);
     }
-
+    public function update(int $id, array $data)
+    {
+        $project = $this->projectRepository->update($id, $data);
+        if (!$project) {
+            throw new ModelNotFoundException('Không tìm thấy dự án');
+        }
+        $project->personnel()->sync($data['personnel']);
+        return new ProjectResource($project);
+    }
     public function find(int $id): ProjectResource
     {
         $project = $this->projectRepository->find($id);
@@ -188,10 +237,41 @@ class ProjectServiceImplement implements ProjectService
                 'new_status' => $project->status
             ])
         ]);
-
         return new ProjectResource($project);
     }
-
+    public function tasks(int|string $id)
+    {
+        $project = $this->projectRepository->find($id);
+        if (!$project) throw new ModelNotFoundException('Không tìm thấy dự án');
+        $paginate = request()->query('paginate');
+        $perPage = request()->query('per_page');
+        $name = request()->query('name');
+        $uuid = request()->query('uuid');
+        $status = request()->query('status');
+        if ($paginate) {
+            $tasks = $project->tasks()->with(['designated_personnel'])->when($name, function ($q) use ($name) {
+                $q->where('name', '%like%', $name);
+            })->when($uuid, function ($q) use ($uuid) {
+                $q->where('uuid', '%like%', $uuid);
+            })->when($status, function ($q) use ($status) {
+                $q->where('status', $status);
+            })->paginate(is_numeric($perPage) ? $perPage : 10);
+            return [
+                'pagination' => $this->paginate($tasks),
+                'data' => TaskResource::collection($tasks->items())
+            ];
+        } else {
+            return [
+                'data'  => TaskResource::collection($project->tasks()->with(['designated_personnel'])->when($name, function ($q) use ($name) {
+                    $q->where('name', '%like%', $name);
+                })->when($uuid, function ($q) use ($uuid) {
+                    $q->where('uuid', '%like%', $uuid);
+                })->when($status, function ($q) use ($status) {
+                    $q->where('status', $status);
+                })->get())
+            ];
+        }
+    }
     public function delete(array $projects)
     {
         $this->projectRepository->query()->whereIn('id', $projects)->delete();

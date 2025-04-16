@@ -9,7 +9,10 @@ interface ProjectService
     public function initiation();
     public function projectQuantity();
     public function projects();
+    public function approve();
+    public function tasks(int|string $id);
     public function find(int $id):ProjectResource;
+    public function update(int $id,array $data);
     public function personnel(int $projectId);
     public function updateStatus(int $projectId,array $data);
     public function lock(int $id);

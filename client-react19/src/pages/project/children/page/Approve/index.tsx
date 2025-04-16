@@ -1,6 +1,144 @@
-import React from "react";
+import useQueryConfig from "@/api/hook/useQueryConfig";
+import { PATH_PROJECT } from "@/constants/path/project";
+import React, { useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import Filter, { FILTER_PROJECT_KEY } from "../../components/Filter";
+import { IProject } from "@/api/interfaces/IProject";
+import { PaginationMeta } from "@/api/hook/usePaginate";
+import QuantityProject from "../../components/ProjectQuantity";
+import { Button } from "@/components/ui/button";
+import { AlignLeft, ChevronUp, Plus } from "lucide-react";
+import ProjectTable from "../../components/ProjectTable";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import Paginate from "@/components/page/paginate";
+import BreadCrumb from "./components/ui/bread-crumb";
 
-const ProjectsApprove:React.FC = () => {
-    return <div>project approve</div>
-}
+const ProjectsApprove: React.FC = () => {
+  const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const [perPage, setPerPage] = useState<string>("10");
+  const { data: projectsData, isFetching } = useQueryConfig(
+    [
+      PATH_PROJECT.QUERY_KEY,
+      PATH_PROJECT.APPROVE.QUERY_KEY +
+        `?paginate=true_project_table&include=pa&per_page=${perPage}&page=${
+          params.get("page") || 1
+        }&${PATH_PROJECT.APPROVE.Filter(
+          params.get(FILTER_PROJECT_KEY.name) || "",
+          params.get(FILTER_PROJECT_KEY.uuid) || "",
+          params.get(FILTER_PROJECT_KEY.status) || "",
+          params.get(FILTER_PROJECT_KEY.startDate) || "",
+          params.get(FILTER_PROJECT_KEY.endDate) || ""
+        )}`,
+    ],
+    PATH_PROJECT.APPROVE.ROUTE +
+      `?paginate=true&include=pa&per_page=${perPage}&page=${
+        params.get("page") || 1
+      }&${PATH_PROJECT.APPROVE.Filter(
+        params.get(FILTER_PROJECT_KEY.name) || "",
+        params.get(FILTER_PROJECT_KEY.uuid) || "",
+        params.get(FILTER_PROJECT_KEY.status) || "",
+        params.get(FILTER_PROJECT_KEY.startDate) || "",
+        params.get(FILTER_PROJECT_KEY.endDate) || ""
+      )}`
+  );
+
+  const project: IProject[] = (projectsData as any)?.data?.data || [];
+  const pagination: PaginationMeta =
+    (projectsData as any)?.data?.pagination || null;
+
+  const [sort, setSort] = useState<"started_at" | "ended_at" | string>(
+    "started_at"
+  );
+
+  const onChangePage = (page: number) => {
+    params.set("page", String(page));
+    navigate(`?${params.toString()}`, { replace: true });
+  };
+  return (
+    <div className="flex flex-col gap-4 w-full">
+      <BreadCrumb/>
+      <QuantityProject display={{
+        sum: false,
+        waiting: true,
+        refuse: false,
+        developing: false,
+        pausing: false,
+        done: false,
+        failed: true,
+        close: false,
+      }} />
+      <Filter type="initiation" />
+      <div className="flex justify-end px-4">
+        <Button
+          onClick={() => navigate("/projects/create")}
+          variant="outline"
+          type="button"
+          className="flex cursor-pointer hover:bg-[#53B69A] hover:text-white items-center gap-2 "
+        >
+          <Plus /> Thêm mới
+        </Button>
+      </div>
+      <div className="w-1000px">
+        <ProjectTable
+          project={project}
+          loading={isFetching}
+          sortByDate={sort}
+          action={{
+           
+            watch: true,
+            changeStatus: true
+          }}
+        />
+      </div>
+      <div className="border-t-2 border-gray-200 p-2 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Select value={sort} onValueChange={setSort}>
+            <SelectTrigger arrowDisplay={false} className="w-[146px]">
+              <AlignLeft /> <SelectValue placeholder="Sắp xếp theo" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Sắp xếp theo</SelectLabel>
+                <SelectItem value="started_at">Ngày bắt đầu</SelectItem>
+                <SelectItem value="ended_at">Ngày kết thúc</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>{" "}
+          <Select value={perPage} onValueChange={setPerPage}>
+            <SelectTrigger arrowDisplay={false} className="w-[146px]">
+              <p>{perPage} / Trang</p>
+              <ChevronUp />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Các bản ghi mỗi trang</SelectLabel>
+                {Array.from({ length: 20 }).map((_, index) => {
+                  return (
+                    <SelectItem key={index} value={String(Number(index) + 5)}>
+                      {Number(index) + 5} bản ghi
+                    </SelectItem>
+                  );
+                })}
+              </SelectGroup>
+            </SelectContent>
+          </Select>{" "}
+        </div>
+        <div>
+          {pagination && (
+            <Paginate meta={pagination} onPageChange={onChangePage} />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
 export default ProjectsApprove;

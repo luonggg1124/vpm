@@ -21,6 +21,7 @@ return new class extends Migration
             // $table->foreignId('declaration_id')->constrained('declarations');
             $table->string('feature');
             $table->foreignId('designated_personnel_id')->constrained('users')->onDelete('cascade');
+            $table->timestamp('status_changed_at')->nullable();
             $table->timestamp('ended_at')->nullable();
             $table->timestamps();
         });

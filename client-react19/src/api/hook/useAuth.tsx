@@ -25,10 +25,7 @@ const useAuth = () => {
   const navigate = useNavigate();
   const isAuthenticated = () => {
     const token = getLocalStorage(TOKENS.ACCESS_TOKEN);
-    const token_ttl = Number(getLocalStorage(TOKENS.ACCESS_TOKEN_TTL));
-    const now = new Date().getTime();
-
-    if (Boolean(token) && now < token_ttl) {
+    if (Boolean(token)) {
       return true;
     }
     return false;
@@ -103,13 +100,12 @@ const useAuth = () => {
       setLoading({ ...loading, logout: false });
     }
   };
-  
+
   return {
     loading,
     login,
     isAuthenticated,
     logout,
-
   };
 };
 export default useAuth;

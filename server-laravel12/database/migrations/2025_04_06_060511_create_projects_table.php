@@ -18,7 +18,7 @@ return new class extends Migration
             $table->timestamp('started_at');
             $table->timestamp('ended_at');
             $table->enum('status',['WAITING','REFUSE','DEVELOPING','PAUSING',"DONE",'FAILED','CLOSE']);
-            $table->text('description');
+            $table->text('description')->nullable();
             $table->boolean('is_lock')->nullable();
             $table->foreignId('pm_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('pa_id')->constrained('users')->onDelete('cascade');

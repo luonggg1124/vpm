@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Project\CreateProjectRequest;
+use App\Http\Requests\Project\UpdateProjectRequest;
 use App\Http\Requests\Project\UpdateStatusRequest;
 use App\Services\Project\ProjectService;
 use Exception;
@@ -54,11 +55,48 @@ class ProjectController extends Controller
             ], 500);
         }
     }
+    public function approve()
+    {
+        try {
+            return response()->json([
+                ...$this->projectService->approve()
+            ]);
+        } catch (\Throwable $th) {
+            Log::error(
+                message: __CLASS__ . '@' . __FUNCTION__,
+                context: [
+                    'line' => $th->getLine(),
+                    'message' => $th->getMessage()
+                ]
+            );
+            return response()->json([
+                'error' => 'Lỗi nội bộ máy chủ'
+            ], 500);
+        }
+    }
     public function projectQuantity()
     {
         try {
             return response()->json([
                 ...$this->projectService->projectQuantity()
+            ]);
+        } catch (\Throwable $th) {
+            Log::error(
+                message: __CLASS__ . '@' . __FUNCTION__,
+                context: [
+                    'line' => $th->getLine(),
+                    'message' => $th->getMessage()
+                ]
+            );
+            return response()->json([
+                'error' => 'Lỗi nội bộ máy chủ'
+            ], 500);
+        }
+    }
+    public function tasks(int|string $id){
+        try {
+            return response()->json([
+                ...$this->projectService->tasks($id)
             ]);
         } catch (\Throwable $th) {
             Log::error(
@@ -81,6 +119,28 @@ class ProjectController extends Controller
                 'data' => $this->projectService->create($request->validated())
             ]);
         } catch (\Throwable $th) {
+            if ($th instanceof Exception) {
+                return response()->json([
+                    'error' => $th->getMessage()
+                ], 500);
+            }
+            return response()->json([
+                'error' => 'Lỗi nội bộ máy chủ'
+            ], 500);
+        }
+    }
+    public function update(int $id, UpdateProjectRequest $request)
+    {
+        try {
+            return response()->json([
+                'data' => $this->projectService->update($id, $request->validated())
+            ]);
+        } catch (\Throwable $th) {
+            if ($th instanceof ModelNotFoundException) {
+                return response()->json([
+                    'error' => 'Không tìm thấy dự án'
+                ], 404);
+            }
             if ($th instanceof Exception) {
                 return response()->json([
                     'error' => $th->getMessage()

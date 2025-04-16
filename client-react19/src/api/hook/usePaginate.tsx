@@ -4,6 +4,7 @@ export type PaginationMeta = {
   next_page: number | null;
   prev_page: number | null;
   last_page: number;
+  total_item: number;
 };
 
 const usePagination = (

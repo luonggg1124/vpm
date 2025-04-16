@@ -1,11 +1,6 @@
 import React from "react";
 import BreadCrumb from "./components/ui/bread-crumb";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 
 import Initiation from "./components/Initiation";
@@ -13,13 +8,12 @@ import Project from "./components/Project";
 import { FILTER_PROJECT_KEY } from "../../components/Filter";
 import { useNavigate } from "react-router-dom";
 const triggers = [
- 
   {
     label: "Khởi tạo",
     value: "initiation",
   },
   {
-    label: "Dự án",
+    label: "Lưu trữ",
     value: "project",
   },
 ];
@@ -27,9 +21,9 @@ const ListProjects: React.FC = () => {
   const navigate = useNavigate();
   const params = new URLSearchParams(window.location.search);
   const onClear = () => {
-      Object.values(FILTER_PROJECT_KEY).forEach((key) => params.delete(key));
-      navigate(`?${params.toString()}`, { replace: true });
-    };
+    Object.values(FILTER_PROJECT_KEY).forEach((key) => params.delete(key));
+    navigate(`?${params.toString()}`, { replace: true });
+  };
   return (
     <div className="my-2 flex flex-col gap-3">
       <BreadCrumb />
@@ -38,7 +32,7 @@ const ListProjects: React.FC = () => {
         <TabsList classDefault={false} className="flex gap-8">
           {triggers.map((item, index) => (
             <TabsTrigger
-            onClick={onClear}
+              onClick={onClear}
               key={index}
               classDefault={false}
               className={cn(
@@ -61,7 +55,7 @@ const ListProjects: React.FC = () => {
           <Project />
         </TabsContent>
         <TabsContent value="initiation">
-          <Initiation/>
+          <Initiation />
         </TabsContent>
       </Tabs>
     </div>

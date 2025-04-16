@@ -27,6 +27,10 @@ class AppBindingServiceProvider extends ServiceProvider
             'User' => [
                 \App\Services\User\UserService::class,
                 \App\Services\User\UserServiceImplement::class
+            ],
+            'Task' => [
+                \App\Services\Task\TaskService::class,
+                \App\Services\Task\TaskServiceImplement::class
             ]
         ];
         foreach ($services as $service) {

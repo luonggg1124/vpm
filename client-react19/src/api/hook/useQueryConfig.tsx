@@ -1,7 +1,7 @@
 import {  useQuery } from "@tanstack/react-query";
 import { apiManager } from "..";
 
-const defautConfig = {
+const defaultConfig = {
   cacheTime: 1000 * 60 * 30,
   staleTime: 1000 * 60 * 30,
   retry: false,
@@ -10,7 +10,7 @@ const defautConfig = {
 const useQueryConfig = (
   key: string | Array<string>,
   api: string,
-  config: any = defautConfig
+  config: any = defaultConfig
 ) => {
   const fetchData = async () => {
     try {
@@ -20,7 +20,7 @@ const useQueryConfig = (
     }
   };
 
-  const { isLoading, data, error, isFetching, refetch } = useQuery({
+  const { isLoading, data, isSuccess,error, isFetching, refetch } = useQuery({
     queryKey: Array.isArray(key) ? [...key] : [key],
     queryFn: fetchData,
     ...config,
@@ -32,6 +32,7 @@ const useQueryConfig = (
     data,
     error,
     refetch,
+    isSuccess
   };
 };
 
