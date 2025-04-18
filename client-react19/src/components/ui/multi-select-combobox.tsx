@@ -23,9 +23,11 @@ interface MultiSelectComboboxProps {
   value: string[]; // selected values
   onSelect: (values: string[]) => void;
   placeholder?: string;
+  disabled?: boolean;
 }
 
 export function MultiSelectCombobox({
+  disabled = false,
   options,
   value,
   onSelect,
@@ -47,22 +49,46 @@ export function MultiSelectCombobox({
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
+      {disabled ? (
         <Button
           variant="outline"
           role="combobox"
           className="w-full h-auto justify-between flex-wrap "
         >
           <div className="flex flex-wrap items-center gap-2">
-            {selectedLabels.length > 0
-              ? selectedLabels.map((item, index) => (
-                  <Badge key={index}>{item} </Badge>
-                ))
-              : <p className="text-sm font-normal text-gray-500">{placeholder}</p>}
+            {selectedLabels.length > 0 ? (
+              selectedLabels.map((item, index) => (
+                <Badge key={index}>{item} </Badge>
+              ))
+            ) : (
+              <p className="text-sm font-normal text-gray-500">{placeholder}</p>
+            )}
           </div>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
-      </PopoverTrigger>
+      ) : (
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            role="combobox"
+            className="w-full h-auto justify-between flex-wrap "
+          >
+            <div className="flex flex-wrap items-center gap-2">
+              {selectedLabels.length > 0 ? (
+                selectedLabels.map((item, index) => (
+                  <Badge key={index}>{item} </Badge>
+                ))
+              ) : (
+                <p className="text-sm font-normal text-gray-500">
+                  {placeholder}
+                </p>
+              )}
+            </div>
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </PopoverTrigger>
+      )}
+
       <PopoverContent className="w-full p-0">
         <Command>
           <CommandInput placeholder="Search..." />

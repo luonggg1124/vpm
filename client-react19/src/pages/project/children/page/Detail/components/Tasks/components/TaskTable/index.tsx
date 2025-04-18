@@ -28,6 +28,7 @@ import { PaginationMeta } from "@/api/hook/usePaginate";
 import UpdateAction from "./components/update";
 import DeleteAction from "./components/delete";
 import { PATH_TASK } from "@/constants/path/task";
+import dayjs from "dayjs";
 
 const TaskTable = () => {
   const navigate = useNavigate();
@@ -43,7 +44,9 @@ const TaskTable = () => {
         }&${PATH_PROJECT.TASKS.Filter(
           params.get(FILTER_TASK_KEY.name) || "",
           params.get(FILTER_TASK_KEY.uuid) || "",
-          params.get(FILTER_TASK_KEY.status) || ""
+          params.get(FILTER_TASK_KEY.status) || "",
+          params.get(FILTER_TASK_KEY.designated_personnel) || "",
+          params.get(FILTER_TASK_KEY.designating_personnel) || ""
         )}`,
     ],
     PATH_PROJECT.TASKS.ROUTE(id) +
@@ -52,11 +55,14 @@ const TaskTable = () => {
       }&${PATH_PROJECT.TASKS.Filter(
         params.get(FILTER_TASK_KEY.name) || "",
         params.get(FILTER_TASK_KEY.uuid) || "",
-        params.get(FILTER_TASK_KEY.status) || ""
+        params.get(FILTER_TASK_KEY.status) || "",
+        params.get(FILTER_TASK_KEY.designated_personnel) || "",
+        params.get(FILTER_TASK_KEY.designating_personnel) || ""
       )}`
   );
 
   const tasks: ITask[] = (projectsData as any)?.data?.data || [];
+
   const pagination: PaginationMeta =
     (projectsData as any)?.data?.pagination || null;
   const [sort, setSort] = useState<"started_at" | "ended_at" | string>(
@@ -71,7 +77,7 @@ const TaskTable = () => {
   return (
     <div>
       <div className="flex flex-col gap-4">
-        <h3 className="text-lg font-semibold">Danh sách thành viên tham gia</h3>
+        {/* <h3 className="text-lg font-semibold">Danh sách thành viên tham gia</h3> */}
         <div className="rounded-md overflow-hidden border">
           <Table>
             <TableHeader>
@@ -92,6 +98,9 @@ const TaskTable = () => {
                 </TableHead>
                 <TableHead className="border-l-1 text-center text-[13px]">
                   Tính năng
+                </TableHead>
+                <TableHead className="border-l-1 text-center text-[13px]">
+                  Người chỉ định
                 </TableHead>
                 <TableHead className="border-l-1 text-center text-[13px]">
                   Chỉ định
@@ -137,37 +146,53 @@ const TaskTable = () => {
                       </TableCell>
                     </TableRow>
                   ))
-                : tasks.map((item, index) => (
-                    <TableRow key={index}>
-                      <TableCell className="text-[12px] border-l-1 text-center whitespace-normal  break-words">
-                        {item?.id}
-                      </TableCell>
-                      <TableCell className="text-[12px] border-l-1 text-center whitespace-normal  w-[167px] max-w-[167px] break-words">
-                        {item?.name}
-                      </TableCell>
-                      <TableCell className="text-[12px] border-l-1 text-center whitespace-normal  w-[167px] max-w-[167px] break-words">
-                        {item?.description}
-                      </TableCell>
-                      <TableCell className="text-[12px] border-l-1 text-center whitespace-normal  w-[167px] max-w-[167px] break-words">
-                        {item?.uuid}
-                      </TableCell>
-                      <TableCell className="text-[12px] border-l-1 text-center whitespace-normal  w-[167px] max-w-[167px] break-words">
-                        {taskStatusString(item?.status) } - {item.status_changed_at}
-                      </TableCell>
-                      <TableCell className="text-[12px] border-l-1 text-center whitespace-normal  w-[167px] max-w-[167px] break-words">
-                        {item?.feature}
-                      </TableCell>
-                      <TableCell className="text-[12px] border-l-1 text-center whitespace-normal  break-words">
-                        {item?.designated_personnel.name} - {item.ended_at}
-                      </TableCell>
-                      <TableCell className="text-[12px] border-l-1 ">
-                        <div className="flex w-full h-full items-center gap-2">
-                          <UpdateAction task={item} />
-                          <DeleteAction task={item} />
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                : tasks.map((item, index) => {
+                    console.log(item);
+
+                    return (
+                      <TableRow key={index}>
+                        <TableCell className="text-[12px] border-l-1 text-center whitespace-normal  break-words">
+                          {index + 1}
+                        </TableCell>
+                        <TableCell className="text-[12px] border-l-1 text-center whitespace-normal  w-[167px] max-w-[167px] break-words">
+                          {item?.name}
+                        </TableCell>
+                        <TableCell className="text-[12px] border-l-1 text-center whitespace-normal  w-[167px] max-w-[167px] break-words">
+                          {item?.description}
+                        </TableCell>
+                        <TableCell className="text-[12px] border-l-1 text-center whitespace-normal  w-[167px] max-w-[167px] break-words">
+                          {item?.uuid}
+                        </TableCell>
+                        <TableCell className="text-[12px] border-l-1 text-center whitespace-normal  w-[167px] max-w-[167px] break-words">
+                          <span className="font-semibold">
+                            {taskStatusString(item?.status)}
+                          </span>{" "}
+                          - {dayjs(item.status_changed_at).format("D/M/YYYY")}
+                        </TableCell>
+                        <TableCell className="text-[12px] border-l-1 text-center whitespace-normal  w-[167px] max-w-[167px] break-words">
+                          {item?.feature}
+                        </TableCell>
+                        <TableCell className="text-[12px] border-l-1 text-center whitespace-normal  break-words">
+                          <span className="font-semibold">
+                            {item?.designating_personnel?.name}
+                          </span>{" "}
+                          - {dayjs(item.created_at).format("D/M/YYYY")}
+                        </TableCell>
+                        <TableCell className="text-[12px] border-l-1 text-center whitespace-normal  break-words">
+                          <span className="font-semibold">
+                            {item?.designated_personnel.name}
+                          </span>{" "}
+                          - {dayjs(item.ended_at).format("D/M/YYYY")}
+                        </TableCell>
+                        <TableCell className="text-[12px] border-l-1 ">
+                          <div className="flex w-full h-full items-center gap-2">
+                            <UpdateAction task={item} />
+                            <DeleteAction task={item} />
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
             </TableBody>
           </Table>
         </div>

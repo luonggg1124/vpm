@@ -15,9 +15,11 @@ export interface ITask {
   status: TaskStatus;
   project?: IProject;
   designated_personnel: IUser;
+  designating_personnel:  IUser;
   ended_at?: string;
   description?: string;
   status_changed_at:string;
+  created_at: string;
 }
 
 export function taskStatusString(status: TaskStatus) {

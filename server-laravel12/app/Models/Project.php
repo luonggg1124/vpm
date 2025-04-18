@@ -33,8 +33,8 @@ class Project extends Model
     // {
     //     return $this->belongsTo(Declaration::class,'declaration_id');
     // }
-    public function pm():BelongsTo{
-        return $this->belongsTo(User::class,'pm_id');
+    public function pm():BelongsToMany{
+        return $this->belongsToMany(User::class,'pm_project','project_id','pm_id');
     }
     public function pa():BelongsTo{
         return $this->belongsTo(User::class,'pa_id');

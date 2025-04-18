@@ -35,9 +35,10 @@ export const PATH_PROJECT = {
       name: string = "",
       uuid: string = "",
       status: string = "",
-     
+      designated_personnel: string,
+      designating_personnel: string
     ) => {
-      return `name=${name}&uuid=${uuid}&status=${status}`;
+      return `name=${name}&uuid=${uuid}&status=${status}&designated_personnel=${designated_personnel}&designating_personnel=${designating_personnel}`;
     },
   },
   APPROVE: {

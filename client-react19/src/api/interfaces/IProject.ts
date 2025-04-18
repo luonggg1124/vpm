@@ -22,7 +22,7 @@ export interface IProject {
   started_at: string;
   ended_at: string;
   status: ProjectStatus;
-  pm?: IUser;
+  pm?: IUser[];
   pa?: IUser;
   is_lock: boolean;
   personnel_count: number;
@@ -92,7 +92,7 @@ export function projectStatusString(status: ProjectStatus) {
 
 export interface ProjectLogMeta {
   action: "UPDATE_STATUS" | "COMPLETE_TASK";
-  project: IProject;
+  project_name: string;
   old_status?: ProjectStatus;
   new_status?: ProjectStatus;
 }

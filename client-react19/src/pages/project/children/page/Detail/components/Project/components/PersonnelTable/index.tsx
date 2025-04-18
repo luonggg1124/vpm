@@ -9,7 +9,7 @@ import {
   SelectItem,
   SelectLabel,
   SelectTrigger,
-  SelectValue,
+
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -21,7 +21,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { PATH_PROJECT } from "@/constants/path/project";
-import { AlignLeft, ChevronUp } from "lucide-react";
+import { ChevronUp } from "lucide-react";
 import { useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 
@@ -42,9 +42,7 @@ const PersonnelTable = () => {
   );
   const users: IPersonnel[] = (data as any)?.data?.data || [];
   const pagination = (data as any)?.data?.pagination;
-  const [sort, setSort] = useState<"started_at" | "ended_at" | string>(
-    "started_at"
-  );
+
   const onChangePage = (page: number) => {
     params.set("page", String(page));
     navigate(`?${params.toString()}`, { replace: true });
@@ -151,18 +149,6 @@ const PersonnelTable = () => {
       </div>
       <div className="border-t-2 border-gray-200 p-2 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Select value={sort} onValueChange={setSort}>
-            <SelectTrigger arrowDisplay={false} className="w-[146px]">
-              <AlignLeft /> <SelectValue placeholder="Sắp xếp theo" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Sắp xếp theo</SelectLabel>
-                <SelectItem value="started_at">Ngày bắt đầu</SelectItem>
-                <SelectItem value="ended_at">Ngày kết thúc</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>{" "}
           <Select value={perPage} onValueChange={setPerPage}>
             <SelectTrigger arrowDisplay={false} className="w-[146px]">
               <p>{perPage} / Trang</p>

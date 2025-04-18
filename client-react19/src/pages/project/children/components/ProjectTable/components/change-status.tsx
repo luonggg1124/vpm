@@ -1,4 +1,4 @@
-import { CalendarIcon, Pen } from "lucide-react";
+import { CalendarIcon } from "lucide-react";
 import {
   IProject,
   ProjectStatus,
@@ -15,15 +15,6 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import {
@@ -36,10 +27,8 @@ import { formatDate } from "@/utils/datetime";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
-import useQueryConfig from "@/api/hook/useQueryConfig";
-import { PATH_USER } from "@/constants/path/user";
-import { IUser } from "@/api/interfaces/IUser";
 import useProject from "@/api/hook/useProject";
+import { MultiSelectCombobox } from "@/components/ui/multi-select-combobox";
 
 type Props = {
   project: IProject;
@@ -52,15 +41,14 @@ const ChangeStatus = ({ project }: Props) => {
     description: "",
   });
   const statusArray: ProjectStatus[] = Object.values(ProjectStatus);
-  const { data: usersData, isFetching } = useQueryConfig(
-    [
-      PATH_USER.ALL.QUERY_KEY +
-        `?${PATH_USER.ALL.Filter([project?.pa?.id || 1])}`,
-    ],
-    PATH_USER.ALL.ROUTE + `?${PATH_USER.ALL.Filter([project?.pa?.id || 1])}`
-  );
 
-  const users: IUser[] = (usersData as any)?.data?.data || [project.pa];
+  const users =
+    project?.pm?.map((item) => {
+      return {
+        value: String(item.id),
+        label: String(item.name),
+      };
+    }) ?? [];
   const [open, setOpen] = useState<boolean>(false);
   const { loading, updateStatus } = useProject();
   const submit = async () => {
@@ -73,11 +61,13 @@ const ChangeStatus = ({ project }: Props) => {
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger className="size-9" asChild>
         <p
-          className={color + " font-semibold text-center border p-2 rounded-lg w-full cursor-pointer"}
+          className={
+            color +
+            " font-semibold text-center border p-2 rounded-lg w-full cursor-pointer"
+          }
         >
           {status}
         </p>
-        
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
@@ -87,27 +77,13 @@ const ChangeStatus = ({ project }: Props) => {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className="flex flex-col gap-2">
-          <h3 className="text-gray-500 font-semibold">Quản trị dự án</h3>
-          <Select
-            onValueChange={(v) =>
-              setProjectData({ ...projectData, pa_id: Number(v) })
-            }
-            defaultValue={String(projectData?.pa_id)}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Chọn trạng thái" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Quản lí dự án</SelectLabel>
-                {users.map((user, index) => (
-                  <SelectItem key={index} value={String(user?.id)}>
-                    {user?.name}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+          <h3 className="text-gray-500 font-semibold">Quản lí dự án</h3>
+          <MultiSelectCombobox
+            disabled
+            onSelect={() => console.log(1)}
+            value={users.map((item) => String(item.value))}
+            options={users}
+          />
           <div className="flex flex-col gap-4 ">
             <h3 className="text-gray-500 font-semibold">
               Trạng thái thực hiện

@@ -18,6 +18,7 @@ import { Eye, Pen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import SendForReview from "./components/send-for-review";
+import dayjs from "dayjs";
 
 type Props = {
   project: IProject[];
@@ -179,7 +180,7 @@ const ProjectTable = ({
                         />
                       </TableCell>
                       <TableCell className="text-[12px] border-l-1 text-center">
-                        {row.id}
+                        {index+1}
                       </TableCell>
                       <TableCell className="text-[12px] border-l-1 text-center  whitespace-normal  w-[167px] max-w-[167px] break-words">
                         <Link
@@ -193,10 +194,10 @@ const ProjectTable = ({
                         {row.uuid}
                       </TableCell>
                       <TableCell className="text-[12px] border-l-1 text-center whitespace-normal  w-[167px] max-w-[167px] break-words">
-                        {row.started_at}
+                        {dayjs(row.started_at).format('D/M/YYYY')}
                       </TableCell>
                       <TableCell className="text-[12px] border-l-1 text-center whitespace-normal  w-[167px] max-w-[167px] break-words">
-                        {row.ended_at}
+                      {dayjs(row.ended_at).format('D/M/YYYY')}
                       </TableCell>
                       <TableCell className="text-[12px] border-l-1 text-center">
                         {row.personnel_count}

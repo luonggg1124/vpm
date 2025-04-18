@@ -44,7 +44,7 @@ class ProjectServiceImplement implements ProjectService
                 ProjectStatus::REFUSE->value,
                 ProjectStatus::WAITING->value,
                 ProjectStatus::DONE->value,
-            ]))->orderByDesc('updated_at')->paginate(is_numeric($perPage) ? $perPage : 10);
+            ]))->orderByDesc('projects.updated_at')->paginate(is_numeric($perPage) ? $perPage : 10);
             return [
                 'pagination' => $this->paginate($projects),
                 'data' =>  ProjectResource::collection($projects->items())
@@ -61,7 +61,7 @@ class ProjectServiceImplement implements ProjectService
                 ProjectStatus::REFUSE->value,
                 ProjectStatus::WAITING->value,
                 ProjectStatus::DONE->value,
-            ]))->orderByDesc('updated_at')->get();
+            ]))->orderByDesc('projects.updated_at')->get();
             return [
                 'data' => ProjectResource::collection($projects)
             ];
@@ -88,7 +88,7 @@ class ProjectServiceImplement implements ProjectService
                 ProjectStatus::FAILED->value,
                 ProjectStatus::CLOSE->value,
                 ProjectStatus::DONE->value,
-            ]))->orderByDesc('updated_at')->paginate(is_numeric($perPage) ? $perPage : 10);
+            ]))->orderByDesc('projects.updated_at')->paginate(is_numeric($perPage) ? $perPage : 10);
             return [
                 'pagination' => $this->paginate($projects),
                 'data' =>  ProjectResource::collection($projects->items())
@@ -104,7 +104,7 @@ class ProjectServiceImplement implements ProjectService
                 ProjectStatus::FAILED->value,
                 ProjectStatus::CLOSE->value,
                 ProjectStatus::DONE->value,
-            ]))->orderByDesc('updated_at')->get();
+            ]))->orderByDesc('projects.updated_at')->get();
             return [
                 'data' => ProjectResource::collection($projects)
             ];
@@ -130,7 +130,7 @@ class ProjectServiceImplement implements ProjectService
             )->whereIn('status', [
                 ProjectStatus::REFUSE->value,
                 ProjectStatus::WAITING->value,
-            ]))->orderBy('updated_at','asc')->paginate(is_numeric($perPage) ? $perPage : 10);
+            ]))->orderBy('projects.updated_at', 'asc')->paginate(is_numeric($perPage) ? $perPage : 10);
             return [
                 'pagination' => $this->paginate($projects),
                 'data' =>  ProjectResource::collection($projects->items())
@@ -145,7 +145,7 @@ class ProjectServiceImplement implements ProjectService
             )->whereIn('status', [
                 ProjectStatus::REFUSE->value,
                 ProjectStatus::WAITING->value,
-            ]))->orderBy('updated_at','asc')->get();
+            ]))->orderBy('projects.updated_at', 'asc')->get();
             return [
                 'data' => ProjectResource::collection($projects)
             ];
@@ -162,6 +162,7 @@ class ProjectServiceImplement implements ProjectService
         if (!$project) {
             throw new Exception("Không thể tạo dự án");
         }
+        $project->pm()->attach($data['pm']);
         $project->personnel()->attach($data['personnel']);
         return new ProjectResource($project);
     }
@@ -171,6 +172,7 @@ class ProjectServiceImplement implements ProjectService
         if (!$project) {
             throw new ModelNotFoundException('Không tìm thấy dự án');
         }
+        $project->pm()->sync($data['pm']);
         $project->personnel()->sync($data['personnel']);
         return new ProjectResource($project);
     }
@@ -219,7 +221,6 @@ class ProjectServiceImplement implements ProjectService
         $project = $this->projectRepository->find($projectId);
         if (!$project) throw new ModelNotFoundException("Không tìm thấy dự án");
         $oldStatus = $project->status;
-        $project->pa_id = $data['pa_id'];
         $project->status = $data['status'];
         if ($project && $data['ended_at'] <= $project->started_at) {
             throw new BadRequestException("Ngày kết thúc không hợp lệ");
@@ -230,12 +231,13 @@ class ProjectServiceImplement implements ProjectService
         $project->logs()->create([
             'user_id' => auth()->user()->id,
             'description' => $data['description'],
-            'meta' => json_encode([
+            'meta' => [
                 'action' => ProjectLogAction::UPDATE_STATUS,
                 'project_name' => $project->name,
                 'old_status' => $oldStatus,
                 'new_status' => $project->status
-            ])
+
+            ]
         ]);
         return new ProjectResource($project);
     }
@@ -247,27 +249,45 @@ class ProjectServiceImplement implements ProjectService
         $perPage = request()->query('per_page');
         $name = request()->query('name');
         $uuid = request()->query('uuid');
+        $designated_personnel = request()->query('designated_personnel');
+        $designating_personnel = request()->query('designating_personnel');
         $status = request()->query('status');
         if ($paginate) {
-            $tasks = $project->tasks()->with(['designated_personnel'])->when($name, function ($q) use ($name) {
+            $tasks = $project->tasks()->with(['designated_personnel', 'designating_personnel'])->when($name, function ($q) use ($name) {
                 $q->where('name', '%like%', $name);
             })->when($uuid, function ($q) use ($uuid) {
                 $q->where('uuid', '%like%', $uuid);
             })->when($status, function ($q) use ($status) {
                 $q->where('status', $status);
-            })->paginate(is_numeric($perPage) ? $perPage : 10);
+            })->when($designated_personnel, function ($q) use ($designated_personnel) {
+                $q->whereHas('designated_personnel', function ($q) use ($designated_personnel) {
+                    $q->where('name', 'ILIKE', "%$designated_personnel%");
+                });
+            })->when($designating_personnel, function ($q) use ($designating_personnel) {
+                $q->whereHas('designating_personnel', function ($q) use ($designating_personnel) {
+                    $q->where('name', 'ILIKE', "%$designating_personnel%");
+                });
+            })->orderByDesc('tasks.updated_at')->paginate(is_numeric($perPage) ? $perPage : 10);
             return [
                 'pagination' => $this->paginate($tasks),
                 'data' => TaskResource::collection($tasks->items())
             ];
         } else {
             return [
-                'data'  => TaskResource::collection($project->tasks()->with(['designated_personnel'])->when($name, function ($q) use ($name) {
+                'data'  => TaskResource::collection($project->tasks()->with(['designated_personnel', 'designating_personnel'])->when($name, function ($q) use ($name) {
                     $q->where('name', '%like%', $name);
                 })->when($uuid, function ($q) use ($uuid) {
                     $q->where('uuid', '%like%', $uuid);
                 })->when($status, function ($q) use ($status) {
                     $q->where('status', $status);
+                })->orderByDesc('tasks.updated_at')->when($designated_personnel, function ($q) use ($designated_personnel) {
+                    $q->whereHas('designated_personnel', function ($q) use ($designated_personnel) {
+                        $q->where('name', 'ILIKE', "%$designated_personnel%");
+                    });
+                })->when($designating_personnel, function ($q) use ($designating_personnel) {
+                    $q->whereHas('designating_personnel', function ($q) use ($designating_personnel) {
+                        $q->where('name', 'ILIKE', "%$designating_personnel%");
+                    });
                 })->get())
             ];
         }

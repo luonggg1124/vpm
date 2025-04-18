@@ -48,7 +48,7 @@ const CreateProject = () => {
     defaultValues: {
       name: "",
       uuid: "",
-      pm_id: "",
+      pm: [] as string[],
       pa_id: "",
       priority: "",
       status: ProjectStatus.Waiting,
@@ -59,7 +59,7 @@ const CreateProject = () => {
     },
   });
   const [personnel, setPersonnel] = useState<string[]>([]);
-
+  const [pm, setPm] = useState<string[]>([]);
   const options = users.map((item) => ({
     value: String(item.id),
     label: item.name,
@@ -67,6 +67,10 @@ const CreateProject = () => {
   const selectPersonnel = (value: string[]) => {
     setPersonnel(value);
     form.setValue("personnel", value);
+  };
+  const selectPm = (value: string[]) => {
+    setPm(value);
+    form.setValue("pm", value);
   };
   const onSubmit = async (value: any) => {
     if (new Date(value?.started_at) >= new Date(value?.ended_at)) {
@@ -103,10 +107,14 @@ const CreateProject = () => {
           message: error?.errors?.started_at,
         });
       }
-      if (error?.errors?.pm_id) {
-        form.setError("pm_id", {
-          message: error?.errors?.pm_id,
-        });
+      if (error?.errors?.pm) {
+        if (Array.isArray(error?.errors?.pm)) {
+          form.setError("pm", { message: error?.errors?.pm[0] });
+        } else {
+          form.setError("pm", {
+            message: error?.errors?.pm,
+          });
+        }
       }
       if (error?.errors?.pa_id) {
         form.setError("pa_id", {
@@ -169,36 +177,17 @@ const CreateProject = () => {
         <div className="grid grid-cols-2 gap-6">
           <div className="flex flex-col gap-2">
             <Label>Người quản lí</Label>
-            <Controller
-              control={form.control}
-              name="pm_id"
-              render={({ field }) => (
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="--Chọn người quản lí--" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Người quản lí</SelectLabel>
-                      {options.map((item, index) => (
-                        <SelectItem key={index} value={item.value}>
-                          {item.label}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              )}
-            />
-
-            <p className="font-thin text-red-600">
-              {form.formState.errors.pm_id
-                ? form.formState.errors.pm_id.message
-                : ""}
-            </p>
+            <MultiSelectCombobox
+            value={pm}
+            onSelect={(v) => selectPm(v)}
+            options={options}
+            placeholder="Chọn thành viên"
+          />
+          <p className="font-thin text-red-600">
+            {form.watch("pm").length === 0
+              ? "Hãy chọn quản lí cho dự án"
+              : ""}
+          </p>
           </div>
           <div className="flex flex-col gap-2">
             <Label>Quản trị dự án</Label>

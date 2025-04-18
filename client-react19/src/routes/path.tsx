@@ -10,9 +10,11 @@ import ListProjects from "../pages/project/children/page/List";
 import Detail from "@/pages/project/children/page/Detail";
 import UpdateProject from "@/pages/project/children/page/Update";
 import Personnel from "@/pages/personnel";
-import ListPersonnel from "@/pages/personnel/children/List";
+
 import Task from "@/pages/task";
 import ListTask from "@/pages/task/children/page/List";
+import CreateTask from "@/pages/task/children/page/Create";
+import ListPersonnel from "@/pages/personnel/children/page/List";
 
 
 const path = [
@@ -56,6 +58,10 @@ const path = [
             path: "update/:id",
             element: <UpdateProject   />,
           },
+          {
+            path: ":id/task/create",
+            element: <CreateTask   />,
+          },
         ],
       },
       {
@@ -75,7 +81,8 @@ const path = [
           {
             path: "",
             element: <ListTask/>
-          }
+          },
+          
         ]
       }
     ],

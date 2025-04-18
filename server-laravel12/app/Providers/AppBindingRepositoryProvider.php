@@ -27,6 +27,10 @@ class AppBindingRepositoryProvider extends ServiceProvider
             'Declaration' => [
                 \App\Repositories\Declaration\DeclarationRepository::class,
                 \App\Repositories\Declaration\DeclarationRepositoryImplement::class
+            ],
+            'Log' => [
+                \App\Repositories\Log\LogRepository::class,
+                \App\Repositories\Log\LogRepositoryImplement::class
             ]
         ];
         foreach ($repositories as $repository) {

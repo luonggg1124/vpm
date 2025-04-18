@@ -1,9 +1,14 @@
 import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import utc from "dayjs/plugin/utc";
+dayjs.extend(relativeTime);
+dayjs.extend(utc);
+import "dayjs/locale/vi";
 export const formatDate = (timestamp: number): string => {
   return dayjs(timestamp).format("YYYY-MM-DD HH:mm:ss");
 };
-export const SECOND: number =  1000;
-export const MINUTE: number = 60* 1000;
+export const SECOND: number = 1000;
+export const MINUTE: number = 60 * 1000;
 export function isDaytime(): boolean {
   const now = new Date();
   const hours = now.getHours();
@@ -22,3 +27,7 @@ export function sortByDateAsc(
     return dateB - dateA;
   });
 }
+export const timeToNow = (time: string) => {
+  dayjs.locale("vi");
+  return dayjs(time).fromNow();
+};

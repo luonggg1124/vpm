@@ -111,6 +111,7 @@ class ProjectController extends Controller
             ], 500);
         }
     }
+    
     public function create(CreateProjectRequest $request)
     {
         try {

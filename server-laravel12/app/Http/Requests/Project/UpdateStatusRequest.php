@@ -27,7 +27,6 @@ class UpdateStatusRequest extends FormRequest
     {
         return [
             'status' => ['required', new Enum(ProjectStatus::class)],
-            'pa_id' => ['required', 'exists:users,id'],
             'ended_at' => ['required', 'date'],
             'description' => ['nullable','string']
         ];

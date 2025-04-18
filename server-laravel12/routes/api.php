@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\DeclarationController;
+use App\Http\Controllers\Api\LogController;
 use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\Api\UserController;
@@ -17,6 +18,7 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::get('project/{projectId}/personnel', [ProjectController::class, 'personnel'])->name('project.personnel');
     Route::get('project/{id}', [ProjectController::class, 'find'])->name('project.find');
     Route::get('project/{id}/tasks', [ProjectController::class, 'tasks'])->name('project.tasks');
+    Route::post('project/{id}/tasks', [TaskController::class, 'create'])->name('project.create');
     Route::post('project', [ProjectController::class, 'create'])->name('project.create');
     Route::put('project/{id}', [ProjectController::class, 'update'])->name('project.update');
     Route::post('project/delete', [ProjectController::class, 'delete'])->name('project.delete');
@@ -25,5 +27,6 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::get('projects/quantity', [ProjectController::class, 'projectQuantity'])->name('project.quantity');
     Route::get('declaration/type', [DeclarationController::class, 'getByType'])->name('declaration.type');
     Route::apiResource('task',TaskController::class)->parameter('task','id');
+    Route::apiResource('log',LogController::class)->parameter('log','id');
     Route::apiResource('user', UserController::class)->parameter('user', 'id');
 });

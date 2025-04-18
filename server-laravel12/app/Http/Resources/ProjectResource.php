@@ -21,7 +21,7 @@ class ProjectResource extends JsonResource
             'started_at' => $this->started_at,
             'ended_at' => $this->ended_at,
             'status' => $this->status,
-            'pm' => new UserResource($this->whenLoaded('pm')),
+            'pm' =>  UserResource::collection($this->whenLoaded('pm')),
             'pa' => new UserResource($this->whenLoaded('pa')),
             'personnel' => UserResource::collection($this->whenLoaded('personnel')),
             'tasks' => TaskResource::collection($this->whenLoaded('tasks')),

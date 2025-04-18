@@ -7,7 +7,6 @@ import {
   SelectItem,
   SelectLabel,
   SelectTrigger,
-  SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -18,7 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { AlignLeft, ChevronUp } from "lucide-react";
+import { ChevronUp } from "lucide-react";
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { FILTER_TASK_KEY } from "../Filter";
@@ -27,6 +26,7 @@ import { PaginationMeta } from "@/api/hook/usePaginate";
 import UpdateAction from "./components/update";
 import DeleteAction from "./components/delete";
 import { PATH_TASK } from "@/constants/path/task";
+import dayjs from "dayjs";
 
 const TaskTable = () => {
   const navigate = useNavigate();
@@ -37,32 +37,30 @@ const TaskTable = () => {
     [
       PATH_TASK.QUERY_KEY,
       PATH_TASK.ALL.ROUTE +
-        `?include=designated_personnel&paginate=true_tasks_table&per_page=${perPage}&page=${
+        `?include=designated_personnel,designating_personnel&paginate=true_tasks_table&per_page=${perPage}&page=${
           params.get("page") || 1
         }&${PATH_TASK.ALL.Filter(
           params.get(FILTER_TASK_KEY.name) || "",
           params.get(FILTER_TASK_KEY.uuid) || "",
-          params.get(FILTER_TASK_KEY.status) || ""
+          params.get(FILTER_TASK_KEY.status) || "",
+          params.get(FILTER_TASK_KEY.designated_personnel) || "",
+          params.get(FILTER_TASK_KEY.designating_personnel) || ""
         )}`,
     ],
     PATH_TASK.ALL.ROUTE +
-      `?include=designated_personnel&paginate=true&per_page=${perPage}&page=${
+      `?include=designated_personnel,designating_personnel&paginate=true&per_page=${perPage}&page=${
         params.get("page") || 1
       }&${PATH_TASK.ALL.Filter(
         params.get(FILTER_TASK_KEY.name) || "",
         params.get(FILTER_TASK_KEY.uuid) || "",
-        params.get(FILTER_TASK_KEY.status) || ""
+        params.get(FILTER_TASK_KEY.status) || "",
+        params.get(FILTER_TASK_KEY.designated_personnel) || "",
+        params.get(FILTER_TASK_KEY.designating_personnel) || ""
       )}`
   );
-
   const tasks: ITask[] = (taskData as any)?.data?.data || [];
   const pagination: PaginationMeta =
     (taskData as any)?.data?.pagination || null;
-  const [sort, setSort] = useState<"started_at" | "ended_at" | string>(
-    "started_at"
-  );
-  console.log(tasks);
-  
   const onChangePage = (page: number) => {
     params.set("page", String(page));
     navigate(`?${params.toString()}`, { replace: true });
@@ -70,7 +68,7 @@ const TaskTable = () => {
   return (
     <div>
       <div className="flex flex-col gap-4">
-        <h3 className="text-lg font-semibold">Danh sách thành viên tham gia</h3>
+        {/* <h3 className="text-lg font-semibold">Danh sách thành viên tham gia</h3> */}
         <div className="rounded-md overflow-hidden border">
           <Table>
             <TableHeader>
@@ -91,6 +89,9 @@ const TaskTable = () => {
                 </TableHead>
                 <TableHead className="border-l-1 text-center text-[13px]">
                   Tính năng
+                </TableHead>
+                <TableHead className="border-l-1 text-center text-[13px]">
+                  Người chỉ định
                 </TableHead>
                 <TableHead className="border-l-1 text-center text-[13px]">
                   Chỉ định
@@ -139,7 +140,7 @@ const TaskTable = () => {
                 : tasks.map((item, index) => (
                     <TableRow key={index}>
                       <TableCell className="text-[12px] border-l-1 text-center whitespace-normal  break-words">
-                        {item?.id}
+                        {index + 1}
                       </TableCell>
                       <TableCell className="text-[12px] border-l-1 text-center whitespace-normal  w-[167px] max-w-[167px] break-words">
                         {item?.name}
@@ -150,15 +151,35 @@ const TaskTable = () => {
                       <TableCell className="text-[12px] border-l-1 text-center whitespace-normal  w-[167px] max-w-[167px] break-words">
                         {item?.uuid}
                       </TableCell>
-                      <TableCell className="text-[12px] border-l-1 text-center whitespace-normal  w-[167px] max-w-[167px] break-words">
-                        {taskStatusString(item?.status)} -{" "}
-                        {item.status_changed_at}
+                      <TableCell className="text-[12px] border-l-1 text-center whitespace-normal break-words">
+                        <span className="font-semibold">
+                          {taskStatusString(item?.status)}
+                        </span>{" "}
+                        -{" "}
+                        {dayjs(
+                          item.status_changed_at ? item.status_changed_at : ""
+                        ).format("D/M/YYYY")}
                       </TableCell>
                       <TableCell className="text-[12px] border-l-1 text-center whitespace-normal  w-[167px] max-w-[167px] break-words">
                         {item?.feature}
                       </TableCell>
                       <TableCell className="text-[12px] border-l-1 text-center whitespace-normal  break-words">
-                        {item?.designated_personnel.name} - {item.ended_at}
+                        <span className="font-semibold">
+                          {item?.designating_personnel.name}
+                        </span>{" "}
+                        -{" "}
+                        {dayjs(item.created_at ? item.created_at : "").format(
+                          "D/M/YYYY"
+                        )}
+                      </TableCell>
+                      <TableCell className="text-[12px] border-l-1 text-center whitespace-normal  break-words">
+                        <span className="font-semibold">
+                          {item?.designated_personnel.name}
+                        </span>{" "}
+                        -{" "}
+                        {dayjs(item.ended_at ? item.ended_at : "").format(
+                          "D/M/YYYY"
+                        )}
                       </TableCell>
                       <TableCell className="text-[12px] border-l-1 ">
                         <div className="flex w-full h-full items-center gap-2">
@@ -173,18 +194,6 @@ const TaskTable = () => {
         </div>
         <div className="border-t-2 border-gray-200 p-2 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Select value={sort} onValueChange={(v) => setSort(v)}>
-              <SelectTrigger arrowDisplay={false} className="w-[146px]">
-                <AlignLeft /> <SelectValue placeholder="Sắp xếp theo" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>Sắp xếp theo</SelectLabel>
-                  <SelectItem value="started_at">Ngày bắt đầu</SelectItem>
-                  <SelectItem value="ended_at">Ngày kết thúc</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>{" "}
             <Select value={perPage} onValueChange={setPerPage}>
               <SelectTrigger arrowDisplay={false} className="w-[146px]">
                 <p>{perPage} / Trang</p>

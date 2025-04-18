@@ -3,6 +3,7 @@ import {
   projectPriorityString,
   projectStatusString,
 } from "@/api/interfaces/IProject";
+import dayjs from "dayjs";
 
 type Props = {
   project: IProject;
@@ -28,8 +29,14 @@ const Detail = ({ project }: Props) => {
         </div>
         <div className="p-4">
           <ul className="flex flex-col">
-            <li>Thời gian bắt đầu dự án: {project?.started_at}</li>
-            <li>Thời gian kết thúc dự án: {project?.ended_at}</li>
+            <li>
+              Thời gian bắt đầu dự án:{" "}
+              {dayjs(project?.started_at).format("D/M/YYYY")}
+            </li>
+            <li>
+              Thời gian kết thúc dự án:{" "}
+              {dayjs(project?.ended_at).format("D/M/YYYY")}
+            </li>
             <li>
               Trạng thái chung:{" "}
               {project?.status

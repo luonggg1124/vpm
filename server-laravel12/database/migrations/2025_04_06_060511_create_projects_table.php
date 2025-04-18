@@ -20,7 +20,7 @@ return new class extends Migration
             $table->enum('status',['WAITING','REFUSE','DEVELOPING','PAUSING',"DONE",'FAILED','CLOSE']);
             $table->text('description')->nullable();
             $table->boolean('is_lock')->nullable();
-            $table->foreignId('pm_id')->constrained('users')->onDelete('cascade');
+            // $table->foreignId('pm_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('pa_id')->constrained('users')->onDelete('cascade');
             $table->enum('priority',['LOW','MEDIUM',"HIGH"]);
             $table->timestamps();

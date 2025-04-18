@@ -11,6 +11,7 @@ import {
 } from "../interfaces/IProject";
 import { useQueryClient } from "@tanstack/react-query";
 import { IUser } from "../interfaces/IUser";
+import { PATH_TASK } from "@/constants/path/task";
 
 type Loadings = {
   getProject: boolean;
@@ -130,7 +131,7 @@ const useProject = () => {
     started_at: string;
     ended_at: string;
     status: ProjectStatus;
-    pm?: IUser;
+    pm?: string[];
     pa?: IUser;
     description: string;
     priority: string;
@@ -143,6 +144,7 @@ const useProject = () => {
       });
       await apiManager("post", PATH_PROJECT.CREATE.ROUTE, data);
       queryClient.invalidateQueries({ queryKey: [PATH_PROJECT.QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: [PATH_TASK.QUERY_KEY] });
       navigate("/projects");
     } catch (error: any) {
       if (error?.status === 400) {
@@ -171,7 +173,7 @@ const useProject = () => {
       started_at: string;
       ended_at: string;
       status: ProjectStatus;
-      pm?: IUser;
+      pm?: string[];
       pa?: IUser;
       description: string;
       priority: string;

@@ -42,7 +42,7 @@ import NotFound from "@/pages/notfound";
 type FormValues = {
   name: string;
   uuid: string;
-  pm_id: string;
+  pm: string[];
   pa_id: string;
   priority: string;
   status: ProjectStatus;
@@ -63,21 +63,24 @@ const UpdateProject = () => {
     isLoading: loadingProject,
     isSuccess: successProject,
   } = useQueryConfig(
-    [PATH_PROJECT.FIND.QUERY_KEY + id] + "?include=pm,pa,personnel",
+    [PATH_PROJECT.QUERY_KEY,PATH_PROJECT.FIND.QUERY_KEY + id+ "?include=pm,pa,personnel-update"] ,
     PATH_PROJECT.FIND.ROUTE + `/${id}?include=pm,pa,personnel`
   );
   const project: IProject = (projectData as any)?.data?.data;
-
-  const { data: usersData, isLoading } = useQueryConfig(
+  
+  const { data: usersData } = useQueryConfig(
     [
       PATH_USER.ALL.QUERY_KEY +
         `?${PATH_USER.ALL.Filter([
           project?.pa?.id || 1,
-          project?.pm?.id || 2,
-        ])}-create`,
+          ...(project?.pm?.map((item) => item.id) ?? []),
+        ])}-update`,
     ],
     PATH_USER.ALL.ROUTE +
-      `?${PATH_USER.ALL.Filter([project?.pm?.id || 1, project?.pm?.id || 2])}`
+      `?${PATH_USER.ALL.Filter([
+        project?.pa?.id || 1,
+        ...(project?.pm?.map((item) => item.id) ?? []),
+      ])}`
   );
   const { loading, updateProject } = useProject();
   const users: IUser[] = (usersData as any)?.data?.data || [];
@@ -86,7 +89,7 @@ const UpdateProject = () => {
     defaultValues: {
       name: "",
       uuid: "",
-      pm_id: "",
+      pm: [] as string[],
       pa_id: "",
       priority: "",
       status: ProjectStatus.Waiting,
@@ -96,28 +99,9 @@ const UpdateProject = () => {
       description: "",
     },
   });
-  useEffect(() => {
-    if (project && successProject) {
-      setTimeout(() => {
-        form.reset({
-          name: project?.name,
-          uuid: project?.uuid,
-          pm_id: project?.pm?.id ? String(project?.pm?.id) : "",
-          pa_id: project?.pa?.id ? String(project?.pa?.id) : "",
-          priority: project.priority,
-          status: project?.status,
-          started_at: project?.started_at,
-          ended_at: project?.ended_at,
-          personnel: project?.personnel.map((item) => String(item.id)),
-          description: project?.description,
-        });
-        setPersonnel(project?.personnel.map((item) => String(item.id)));
-      }, 1000);
-    }
-  }, [project, successProject]);
 
   const [personnel, setPersonnel] = useState<string[]>([]);
-
+  const [pm, setPm] = useState<string[]>([]);
   const options = users.map((item) => ({
     value: String(item.id),
     label: item.name,
@@ -126,6 +110,30 @@ const UpdateProject = () => {
     setPersonnel(value);
     form.setValue("personnel", value);
   };
+  const selectPm = (value: string[]) => {
+    setPm(value);
+    form.setValue("pm", value);
+  };
+  useEffect(() => {
+    if (project && successProject) {
+      setTimeout(() => {
+        form.reset({
+          name: project?.name,
+          uuid: project?.uuid,
+          pm: project?.pm?.map((item) => String(item.id)),
+          pa_id: project?.pa?.id ? String(project?.pa?.id) : "",
+          priority: project.priority,
+          status: project?.status,
+          started_at: project?.started_at,
+          ended_at: project?.ended_at,
+          personnel: project?.personnel.map((item) => String(item.id)),
+          description: project?.description,
+        });
+        setPm(project?.pm?.map((item) => String(item.id)) as string[]);
+        setPersonnel(project?.personnel.map((item) => String(item.id)));
+      }, 1000);
+    }
+  }, [project, successProject]);
   const onSubmit = async (value: any) => {
     if (new Date(value?.started_at) >= new Date(value?.ended_at)) {
       form.setError("ended_at", {
@@ -133,7 +141,7 @@ const UpdateProject = () => {
       });
       return;
     }
-    const error = await updateProject(id,value);
+    const error = await updateProject(id, value);
 
     if (error?.errors) {
       if (error?.errors?.name) {
@@ -187,6 +195,7 @@ const UpdateProject = () => {
       }
     }
   };
+
   if (!loadingProject && !project) {
     return <NotFound />;
   }
@@ -197,7 +206,7 @@ const UpdateProject = () => {
       </div>
     );
   }
-  console.log("current value:", form.watch("pm_id"));
+
   return (
     <FormProvider {...form}>
       <form
@@ -238,31 +247,15 @@ const UpdateProject = () => {
         <div className="grid grid-cols-2 gap-6">
           <div className="flex flex-col gap-2">
             <Label>Người quản lí</Label>
-            <Controller
-              control={form.control}
-              name="pm_id"
-              render={({ field }) => (
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="--Chọn người quản lí--" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Người quản lí</SelectLabel>
-                      {options.map((item, index) => (
-                        <SelectItem key={index} value={item.value}>
-                          {item.label}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              )}
+            <MultiSelectCombobox
+              value={pm}
+              onSelect={(v) => selectPm(v)}
+              options={options}
+              placeholder="Chọn thành viên"
             />
-
             <p className="font-thin text-red-600">
-              {form.formState.errors.pm_id
-                ? form.formState.errors.pm_id.message
+              {form.watch("pm")?.length === 0
+                ? "Hãy chọn quản lí nhân sự cho dự án"
                 : ""}
             </p>
           </div>
@@ -430,7 +423,10 @@ const UpdateProject = () => {
         </div>
         <div className="col-span-2 flex flex-col gap-2">
           <Label>Mô tả</Label>
-          <Textarea value={form.watch('description')} {...form.register("description")} />
+          <Textarea
+            value={form.watch("description")}
+            {...form.register("description")}
+          />
         </div>
         <div className="flex flex-col col-span-2 gap-2">
           <Label>Trạng thái</Label>

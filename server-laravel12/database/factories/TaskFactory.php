@@ -24,9 +24,11 @@ class TaskFactory extends Factory
             'project_id' => random_int(1,20),
             'status' => $this->faker->randomElement(['DONE','PENDING','PAUSING','OVERDUE']),
             'feature' => $this->faker->name(),
-            'designated_personnel_id' => random_int(1,20),
+            'designating_personnel_id' => random_int(1,100),
+            'designated_personnel_id' => random_int(1,100),
             'status_changed_at' => Carbon::instance($this->faker->dateTimeBetween('-1 months', 'now')),
             'ended_at' =>  Carbon::instance($this->faker->dateTimeBetween('-1 months', 'now')),
+            'priority' => $this->faker->randomElement(['LOW', 'MEDIUM', "HIGH"])
         ];
     }
 }

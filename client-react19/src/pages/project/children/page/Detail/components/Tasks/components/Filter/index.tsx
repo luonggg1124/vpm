@@ -15,12 +15,16 @@ export const FILTER_TASK_KEY = {
   name: "task_name",
   uuid: "task_uuid",
   status: "task_status",
+  designated_personnel: "designated_personnel",
+  designating_personnel: "designating_personnel",
 };
 const Filter = () => {
   const [filter, setFilter] = useState({
     name: "",
     uuid: "",
     status: "",
+    designated_personnel: "",
+    designating_personnel: "",
   });
   const navigate = useNavigate();
   const [params] = useSearchParams();
@@ -35,7 +39,22 @@ const Filter = () => {
     } else {
       params.delete(FILTER_TASK_KEY.uuid);
     }
-
+    if (Boolean(filter.designated_personnel)) {
+      params.set(
+        FILTER_TASK_KEY.designated_personnel,
+        filter.designated_personnel
+      );
+    } else {
+      params.delete(FILTER_TASK_KEY.designated_personnel);
+    }
+    if (Boolean(filter.designating_personnel)) {
+      params.set(
+        FILTER_TASK_KEY.designating_personnel,
+        filter.designating_personnel
+      );
+    } else {
+      params.delete(FILTER_TASK_KEY.designating_personnel);
+    }
     if (Boolean(filter.status)) {
       params.set(FILTER_TASK_KEY.status, filter.status);
     } else {
@@ -50,6 +69,8 @@ const Filter = () => {
       name: "",
       uuid: "",
       status: "",
+      designated_personnel: "",
+      designating_personnel: "",
     });
     navigate(`?${params.toString()}`, { replace: true });
   };
@@ -68,6 +89,26 @@ const Filter = () => {
           value={filter.uuid}
           onChange={(e: any) => setFilter({ ...filter, uuid: e.target.value })}
           placeholder="Mã"
+          className="w-[202px]"
+        />
+      </div>
+      <div>
+        <Input
+          value={filter.designating_personnel}
+          onChange={(e: any) =>
+            setFilter({ ...filter, designating_personnel: e.target.value })
+          }
+          placeholder="Tên người chỉ định"
+          className="w-[202px]"
+        />
+      </div>
+      <div>
+        <Input
+          value={filter.designated_personnel}
+          onChange={(e: any) =>
+            setFilter({ ...filter, designated_personnel: e.target.value })
+          }
+          placeholder="Tên người được chỉ định"
           className="w-[202px]"
         />
       </div>

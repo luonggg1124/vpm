@@ -16,17 +16,17 @@ class ProjectFactory extends Factory
      * @return array<string, mixed>
      */
     public function definition(): array
-    {$start = Carbon::instance($this->faker->dateTimeBetween('-1 year', 'now'));
+    {
+        $start = Carbon::instance($this->faker->dateTimeBetween('-1 year', 'now'));
         return [
             'uuid' => $this->faker->company(),
             'name' => $this->faker->name(),
             'started_at' => $start,
             'ended_at' => Carbon::instance($this->faker->dateTimeBetween($start, '+6 months')),
-            'status' => $this->faker->randomElement(['WAITING','REFUSE','DEVELOPING','PAUSING',"DONE"]),
+            'status' => $this->faker->randomElement(['WAITING', 'REFUSE', 'DEVELOPING', 'PAUSING', "DONE"]),
             'description' => $this->faker->sentence,
-            'pm_id' => random_int(1,10),
-            'pa_id' => random_int(1,10),
-            'priority' => $this->faker->randomElement(['LOW','MEDIUM',"HIGH"])
+            'pa_id' => random_int(1, 10),
+            'priority' => $this->faker->randomElement(['LOW', 'MEDIUM', "HIGH"])
         ];
     }
 }

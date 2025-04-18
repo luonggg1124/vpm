@@ -129,12 +129,12 @@ class DatabaseSeeder extends Seeder
         $firstDepartment->department_head_id = 1;
         $firstDepartment->save();
         Department::factory(10)->create();
-        $user = User::factory(20)->create()->pluck('id')->toArray();
+        $user = User::factory(100)->create()->pluck('id')->toArray();
 
-        $project = Project::factory(20)->create();
+        $project = Project::factory(100)->create();
         foreach ($project as $p) {
             $p->personnel()->attach([...$user]);
-            
+            $p->pm()->attach([1,2,3]);
         }
         Task::factory(20000)->create();
     }

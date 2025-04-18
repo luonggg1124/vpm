@@ -10,6 +10,8 @@ interface TaskRepository extends BaseRepository
     public function filter(
         $name = null,
         $uuid = null,
-        $status = null
+        $status = null,
+        $designated_personnel = null,
+        $designating_personnel = null
     ): Builder;
 }
