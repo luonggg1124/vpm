@@ -21,6 +21,8 @@ class Task extends Model
         'status_changed_at',
         'ended_at',
         'priority',
+         'created_at',
+        'updated_at'
     ];
     protected $casts = [
         'status' => \App\Enum\TaskStatus::class,

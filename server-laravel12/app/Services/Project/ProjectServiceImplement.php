@@ -45,7 +45,7 @@ class ProjectServiceImplement implements ProjectService
                 ProjectStatus::REFUSE->value,
                 ProjectStatus::WAITING->value,
                 ProjectStatus::DONE->value,
-            ]))->orderByDesc('projects.created_at')->paginate(is_numeric($perPage) ? $perPage : 10);
+            ]))->orderByDesc('projects.updated_at')->paginate(is_numeric($perPage) ? $perPage : 10);
             return [
                 'pagination' => $this->paginate($projects),
                 'data' =>  ProjectResource::collection($projects->items())
@@ -62,7 +62,7 @@ class ProjectServiceImplement implements ProjectService
                 ProjectStatus::REFUSE->value,
                 ProjectStatus::WAITING->value,
                 ProjectStatus::DONE->value,
-            ]))->orderByDesc('projects.created_at')->get();
+            ]))->orderByDesc('projects.updated_at')->get();
             return [
                 'data' => ProjectResource::collection($projects)
             ];
@@ -89,7 +89,7 @@ class ProjectServiceImplement implements ProjectService
                 ProjectStatus::FAILED->value,
                 ProjectStatus::CLOSE->value,
                 ProjectStatus::DONE->value,
-            ]))->orderByDesc('projects.created_at')->paginate(is_numeric($perPage) ? $perPage : 10);
+            ]))->orderByDesc('projects.updated_at')->paginate(is_numeric($perPage) ? $perPage : 10);
             return [
                 'pagination' => $this->paginate($projects),
                 'data' =>  ProjectResource::collection($projects->items())
@@ -105,7 +105,7 @@ class ProjectServiceImplement implements ProjectService
                 ProjectStatus::FAILED->value,
                 ProjectStatus::CLOSE->value,
                 ProjectStatus::DONE->value,
-            ]))->orderByDesc('projects.created_at')->get();
+            ]))->orderByDesc('projects.updated_at')->get();
             return [
                 'data' => ProjectResource::collection($projects)
             ];
@@ -131,7 +131,7 @@ class ProjectServiceImplement implements ProjectService
             )->whereIn('status', [
                 ProjectStatus::REFUSE->value,
                 ProjectStatus::WAITING->value,
-            ]))->orderByDesc('projects.created_at')->paginate(is_numeric($perPage) ? $perPage : 10);
+            ]))->orderByDesc('projects.updated_at')->paginate(is_numeric($perPage) ? $perPage : 10);
             return [
                 'pagination' => $this->paginate($projects),
                 'data' =>  ProjectResource::collection($projects->items())
@@ -146,7 +146,7 @@ class ProjectServiceImplement implements ProjectService
             )->whereIn('status', [
                 ProjectStatus::REFUSE->value,
                 ProjectStatus::WAITING->value,
-            ]))->orderByDesc('projects.created_at')->get();
+            ]))->orderByDesc('projects.updated_at')->get();
             return [
                 'data' => ProjectResource::collection($projects)
             ];

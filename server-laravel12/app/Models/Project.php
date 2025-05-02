@@ -28,6 +28,8 @@ class Project extends Model
         'pa_id',
         'creator_id',
         'priority',
+        'created_at',
+        'updated_at'
     ];
     // public function declaration():BelongsTo
     // {

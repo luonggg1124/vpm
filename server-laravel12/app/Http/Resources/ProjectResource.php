@@ -33,6 +33,8 @@ class ProjectResource extends JsonResource
             'priority' => $this->priority,
             'logs' => ProjectLogResource::collection($this->whenLoaded('logs')),
             'description' => $this->description,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
         ];
     }
 }
