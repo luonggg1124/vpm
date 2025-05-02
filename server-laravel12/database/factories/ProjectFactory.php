@@ -27,7 +27,9 @@ class ProjectFactory extends Factory
             'creator_id' =>random_int(1, 10),
             'description' => $this->faker->sentence,
             'pa_id' => random_int(1, 10),
-            'priority' => $this->faker->randomElement(['LOW', 'MEDIUM', "HIGH"])
+            'priority' => $this->faker->randomElement(['LOW', 'MEDIUM', "HIGH"]),
+            'created_at' => now(),
+            'updated_at' => now(),
         ];
     }
 }

@@ -828,6 +828,9 @@ class DatabaseSeeder extends Seeder
         foreach($allProject as $p) {
             $p->personnel()->attach($allUserId);     
             $p->pm()->attach([1,2,3]);
+            $p->created_at = now();
+            $p->updated_at = now();
+            $p->save();
         }      
         // Department::factory(10)->create();
         // $user = User::factory(100)->create()->pluck('id')->toArray();
