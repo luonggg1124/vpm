@@ -23,7 +23,7 @@ const Header: React.FC = () => {
         <button className="cursor-pointer">
           <AlignJustify />
         </button>
-        <div className="font-serif">vPM</div>
+        <div className="font-serif">Lifetex</div>
       </div>
       <div>
         <DropdownMenu>
