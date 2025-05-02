@@ -825,6 +825,12 @@ class DatabaseSeeder extends Seeder
         Task::insert($tasks);
         $allUserId = User::all()->pluck('id')->toArray();
         $allProject = Project::all();
+        $allTasks = Task::all();
+        foreach($allTasks as $p) {
+            $p->created_at = now();
+            $p->updated_at = now();
+            $p->save();
+        } 
         foreach($allProject as $p) {
             $p->personnel()->attach($allUserId);     
             $p->pm()->attach([1,2,3]);
